@@ -2,7 +2,7 @@
 {% block title %} Contactos {% endblock %}
 {% block body %}
 	 <h1>Ficha del contacto</h1>
-    {% if contacto %}
+    {% if contactos %}
         {% for contacto in contactos %}
             {{include ('partials/datos_contacto.html.twig', {'contacto': contacto})}}
         {% endfor %}
