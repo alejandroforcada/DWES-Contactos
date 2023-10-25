@@ -9,7 +9,8 @@
         <li><strong>Provincia: </strong>: {{ contacto.provincia.nombre }}</li>
     {% endif %}
     <li><strong>E-mail</strong>: {{ contacto.email }}</li>
-    <li><a href="/contacto/editar/{{contacto.id}}"> Editar</a><li>
-    <li><a href="/contacto/delete/{{contacto.id}}">Borrar</a><li>
+   
 
 </ul>
+    <a href="/contacto/editar/{{contacto.id}}"> Editar</a>
+    <a href="/contacto/delete/{{contacto.id}}">Borrar</a>

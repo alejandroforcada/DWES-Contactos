@@ -8,11 +8,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Entity\Provincia;
 use App\Entity\Contacto;
+use App\Entity\User;
 use App\Form\ContactoType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ContactoController extends AbstractController
@@ -48,8 +50,10 @@ class ContactoController extends AbstractController
     }
 
     #[Route('/contacto/editar/{codigo}', name:"editar_contacto", requirements:["codigo"=>"\d+"])]
-    public function editar(ManagerRegistry $doctrine, Request $request, $codigo){
+    public function editar(ManagerRegistry $doctrine, Request $request, $codigo, SessionInterface $session){
+        $user=$this->getUser();
 
+        if ($user){
         $repositorio=$doctrine->getRepository(Contacto::class);
         $contacto=$repositorio->find($codigo);
 
@@ -65,10 +69,19 @@ class ContactoController extends AbstractController
                
 
             }
+            $session->invalidate();
 
         return $this->render('contacto/nuevo.html.twig',array(
             'formulario'=>$formulario->createView()
         ));
+    }
+    else{
+        $url= $this->generateUrl(
+            'editar_contacto',['codigo'=>$codigo]
+        );
+        $session->set('enlace', $url);
+        return $this->redirectToRoute('app_login');
+    }
     }
 
     #[Route('/contacto/insertar', name:"insertar_contacto")]
@@ -116,7 +129,11 @@ class ContactoController extends AbstractController
     }
 
     #[Route('/contacto/delete/{id}', name:"eliminar_contacto")]
-    public function delete(ManagerRegistry $doctrine,$id): Response{
+    public function delete(ManagerRegistry $doctrine,$id, SessionInterface $session): Response{
+        $user=$this->getUser();
+
+
+        if ($user){
         $entityManager=$doctrine->getManager();
         $repositorio=$doctrine->getRepository(Contacto::class);
         $contacto=$repositorio->find($id);
@@ -133,7 +150,17 @@ class ContactoController extends AbstractController
         }
         else
         {
+            
             return $this->render('ficha_contacto.html.twig',['contacto'=>null]);
+        }
+    }
+
+        else{
+            $url= $this->generateUrl(
+                'eliminar_contacto',['id'=>$id]
+            );
+            $session->set('enlace', $url);
+            return $this->redirectToRoute('app_login');
         }
     }
     #[Route('/contacto/insertarConProvincia', name: 'insertar_con_provincia_contacto')]
