@@ -97,7 +97,7 @@ class ContactoController extends AbstractController
                
 
             }
-            $session->invalidate();
+            
 
         return $this->render('contacto/nuevo.html.twig',array(
             'formulario'=>$formulario->createView()
@@ -112,49 +112,6 @@ class ContactoController extends AbstractController
     }
     }
 
-    #[Route('/contacto/insertar', name:"insertar_contacto")]
-    public function insertar (ManagerRegistry $doctrine)
-    {
-        $entityManager=$doctrine->getManager();
-        foreach($this-> contactos as $c){
-            $contacto= new Contacto();
-            $contacto-> setNombre($c["nombre"]);
-            $contacto-> setTelefono($c["telefono"]);
-            $contacto-> setEmail($c["email"]);
-            $entityManager->persist($contacto);
-        }
-        try{
-            $entityManager->flush();
-            return new Response ("contactos insertados");
-        }
-        catch (\Exception $e){
-            return new Response ("error insertando objetos");
-
-        }
-    }
-    #[Route('/contacto/update/{id}/{nombre}', name:"modificar_contacto")]
-    public function update(ManagerRegistry $doctrine,$id,$nombre): Response{
-        $entityManager=$doctrine->getManager();
-        $repositorio=$doctrine->getRepository(Contacto::class);
-        $contacto=$repositorio->find($id);
-        if ($contacto){
-            $contacto->setNombre($nombre);
-            try
-            {
-                $entityManager->flush();
-                return $this->render('ficha_contacto.html.twig',['contacto'=>$contacto
-    
-            ]);
-            }
-            catch(\Exception $e){
-                return new Response("error insertando objetos");
-            }
-        }
-        else
-        {
-            return $this->render('ficha_contacto.html.twig',['contacto'=>null]);
-        }
-    }
 
     #[Route('/contacto/delete/{id}', name:"eliminar_contacto")]
     public function delete(ManagerRegistry $doctrine,$id, SessionInterface $session): Response{
